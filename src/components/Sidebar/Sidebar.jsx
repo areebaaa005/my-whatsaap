@@ -8,44 +8,80 @@ export default function Sidebar({ contacts, setActiveId, activeId, initials }) {
   );
 
   return (
-    <div style={{ width: "30%", minWidth: "350px", background: "#111b21", borderRight: "1px solid rgba(134, 150, 160, 0.15)", display: "flex", flexDirection: "column" }}>
+    <div style={{ 
+      width: "30%", 
+      minWidth: "350px", 
+      background: "#ffffff", 
+      borderRight: "1px solid #e9edef", 
+      display: "flex", 
+      flexDirection: "column",
+      height: "100%"
+    }}>
       
-      {/* Sidebar-specific internal styles for hover */}
       <style>{`
-        .contact-item { transition: background 0.2s ease; }
-        .contact-item:hover { background: #202c33 !important; }
+        .contact-item { transition: background 0.1s ease; }
+        .contact-item:hover { background: #f5f6f6 !important; }
         ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-thumb { background: rgba(134, 150, 160, 0.2); }
+        ::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.1); }
       `}</style>
 
-      {/* 1. Sidebar Header */}
-      <div style={{ background: "#202c33", padding: "10px 16px", display: "flex", justifyContent: "space-between", alignItems: "center", minHeight: "59px" }}>
-        <div style={{ width: 40, height: 40, borderRadius: "50%", background: "#53bdeb", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "600", color: "white", fontSize: "14px" }}>
-          AI
+      {/* 1. Sidebar Header - Profile Picture added here */}
+      <div style={{ 
+        background: "#f0f2f5", 
+        padding: "10px 16px", 
+        display: "flex", 
+        justifyContent: "space-between", 
+        alignItems: "center", 
+        height: "59px" 
+      }}>
+        <div style={{ 
+          width: 40, height: 40, borderRadius: "50%", 
+          background: "#00a884", display: "flex", 
+          alignItems: "center", justifyContent: "center", 
+          fontWeight: "600", color: "white", fontSize: "14px",
+          cursor: "pointer", overflow: "hidden" // Added overflow hidden
+        }}>
+          {/* User's own profile pic placeholder */}
+          <img 
+            src="https://randomuser.me/api/portraits/lego/1.jpg" 
+            alt="Me" 
+            style={{ width: "100%", height: "100%", objectFit: "cover" }} 
+          />
         </div>
-        <div style={{ display: "flex", gap: "22px", color: "#aebac1", fontSize: "19px" }}>
-          <span style={{ cursor: "pointer", opacity: 0.8 }} title="Communities">👥</span>
-          <span style={{ cursor: "pointer", opacity: 0.8 }} title="Status">⭕</span>
-          <span style={{ cursor: "pointer", opacity: 0.8 }} title="New Chat">💬</span>
-          <span style={{ cursor: "pointer", opacity: 0.8 }} title="Menu">⋮</span>
+        <div style={{ display: "flex", gap: "24px", color: "#54656f", fontSize: "20px" }}>
+          <span style={{ cursor: "pointer", opacity: 0.9 }} title="Communities">👥</span>
+          <span style={{ cursor: "pointer", opacity: 0.9 }} title="Status">⭕</span>
+          <span style={{ cursor: "pointer", opacity: 0.9 }} title="New Chat">💬</span>
+          <span style={{ cursor: "pointer", opacity: 0.9 }} title="Menu">⋮</span>
         </div>
       </div>
 
-      {/* 2. Search Bar - Polished */}
-      <div style={{ padding: "7px 12px", borderBottom: "1px solid rgba(134, 150, 160, 0.08)" }}>
-        <div style={{ background: "#202c33", borderRadius: "8px", display: "flex", alignItems: "center", padding: "0 14px", height: "35px" }}>
-          <span style={{ color: "#8696a0", fontSize: "14px", marginTop: "-2px" }}>🔍</span>
+      {/* 2. Search Bar */}
+      <div style={{ padding: "7px 12px", background: "#ffffff" }}>
+        <div style={{ 
+          background: "#f0f2f5", 
+          borderRadius: "8px", 
+          display: "flex", 
+          alignItems: "center", 
+          padding: "0 12px", 
+          height: "35px" 
+        }}>
+          <span style={{ color: "#54656f", fontSize: "14px" }}>🔍</span>
           <input 
             type="text" 
             placeholder="Search or start new chat" 
-            style={{ background: "none", border: "none", outline: "none", color: "#e9edef", width: "100%", fontSize: "14px", paddingLeft: "15px" }}
+            style={{ 
+              background: "none", border: "none", outline: "none", 
+              color: "#3b4a54", width: "100%", fontSize: "14px", 
+              paddingLeft: "15px", fontWeight: "400" 
+            }}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
       </div>
 
-      {/* 3. Contacts List */}
+      {/* 3. Contacts List - Refined with Profile Image logic */}
       <div style={{ flex: 1, overflowY: "auto" }}>
         {filteredContacts.map((contact) => (
           <div 
@@ -55,57 +91,82 @@ export default function Sidebar({ contacts, setActiveId, activeId, initials }) {
             style={{ 
               display: "flex", 
               alignItems: "center", 
-              padding: "12px 16px", 
+              height: "72px", 
+              padding: "0 16px", 
               cursor: "pointer", 
-              background: activeId === contact.id ? "#2a3942" : "transparent",
-              borderBottom: "1px solid rgba(134, 150, 160, 0.08)"
+              background: activeId === contact.id ? "#f0f2f5" : "transparent"
             }}
           >
-            {/* Profile Initials Avatar */}
+            {/* Profile Avatar with Image Fallback */}
             <div style={{ 
               width: 49, height: 49, borderRadius: "50%", 
               background: contact.color[1], color: contact.color[0], 
               display: "flex", alignItems: "center", justifyContent: "center", 
               fontWeight: "500", marginRight: "15px", fontSize: "17px",
-              flexShrink: 0
+              flexShrink: 0, overflow: "hidden" // Added overflow hidden
             }}>
-              {initials(contact.name)}
+              {contact.img ? (
+                <img 
+                  src={contact.img} 
+                  alt={contact.name} 
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }} 
+                />
+              ) : (
+                initials(contact.name)
+              )}
             </div>
 
-            {/* Contact Details */}
-            <div style={{ flex: 1, overflow: "hidden" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "2px" }}>
-                <span style={{ color: "#e9edef", fontWeight: 400, fontSize: "16px" }}>{contact.name}</span>
-                <span style={{ color: activeId === contact.id ? "#8696a0" : "#00a884", fontSize: "12px", marginTop: "4px" }}>
+            {/* Contact Details Wrapper */}
+            <div style={{ 
+              flex: 1, 
+              height: "100%", 
+              display: "flex", 
+              flexDirection: "column", 
+              justifyContent: "center",
+              borderBottom: "1px solid #f2f2f2" 
+            }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+                <span style={{ color: "#111b21", fontSize: "16.5px", fontWeight: "400" }}>
+                  {contact.name}
+                </span>
+                <span style={{ 
+                  color: "#667781", 
+                  fontSize: "12px" 
+                }}>
                   12:45 PM
                 </span>
               </div>
+              
               <div style={{ 
-                color: "#8696a0", 
+                color: "#667781", 
                 fontSize: "13.5px", 
+                marginTop: "2px",
                 whiteSpace: "nowrap", 
                 overflow: "hidden", 
                 textOverflow: "ellipsis",
                 display: "flex",
                 alignItems: "center",
-                gap: "3px"
+                gap: "4px"
               }}>
-                {/* Visual indicator for 'me' messages */}
                 {contact.msgs.length > 0 && contact.msgs[contact.msgs.length-1].from === "me" && (
-                  <span style={{ fontSize: "14px" }}>✓✓ </span>
+                  <span style={{ color: "#53bdeb", fontSize: "15px" }}>✓✓ </span>
                 )}
-                {contact.msgs.length > 0 ? (
-                    contact.msgs[contact.msgs.length-1].type === "call_log" 
-                    ? `📞 Call Log` 
-                    : contact.msgs[contact.msgs.length-1].text
-                ) : contact.about}
+                
+                <span style={{ overflow: "hidden", textOverflow: "ellipsis" }}>
+                  {contact.msgs.length > 0 ? (
+                      contact.msgs[contact.msgs.length-1].type === "call_log" 
+                      ? `📞 Call Log` 
+                      : contact.msgs[contact.msgs.length-1].text
+                  ) : contact.about}
+                </span>
               </div>
             </div>
           </div>
         ))}
+        
         {filteredContacts.length === 0 && (
-          <div style={{ color: "#8696a0", textAlign: "center", padding: "40px 20px", fontSize: "14px" }}>
-            No contacts found
+          <div style={{ color: "#667781", textAlign: "center", padding: "40px 20px", fontSize: "14px" }}>
+            No chats, contacts or messages found
           </div>
         )}
       </div>

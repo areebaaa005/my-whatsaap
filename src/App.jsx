@@ -1,22 +1,33 @@
 import { useState, useRef, useEffect } from "react";
-import SearchBar from './components/Sidebar/SearchBar';
-import ContactList from './components/Sidebar/ContactList';
+import Sidebar from './components/Sidebar/Sidebar';
 import ChatWindow from './components/Chat/ChatWindow';
 import InputBar from './components/Chat/InputBar';
 import CallScreen from './components/Chat/CallScreen'; 
 
 const CONTACTS = [
   {
-    id: 1, name: "Aisha Rahman", avatar: "AR", color: ["#25d366","#0a2e1a"],
-    status: "online", about: "Hey there! I am using WhatsApp",
+    id: 1, 
+    name: "Aisha Rahman", 
+    avatar: "AR", 
+    // Maine yahan Aisha ke liye image link daal diya hai
+    img: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=150&h=150&auto=format&fit=crop", 
+    color: ["#ffffff","#00a884"],
+    status: "online", 
+    about: "Hey there! I am using WhatsApp",
     msgs: [
       { id:1, from:"them", text:"Assalam o Alaikum! Kya haal hai?", time:"9:01 AM", date:"Today", read:true },
-      { id:2, from:"me", text:"Walaikum Assalam! Sab theek, aap sunao?", time:"9:03 AM", date:"Today", read:true },
+      { id:2, from:"me", text:"Walaikum Assalam! Sab theek, aap sunao?", time:"9:03 AM", date:"Today", status:"read" },
     ]
   },
   {
-    id: 2, name: "Marcus Dev", avatar: "MD", color: ["#128c7e","#0a1f1e"],
-    status: "online", about: "Coding all day every day 💻",
+    id: 2, 
+    name: "Marcus Dev", 
+    avatar: "MD", 
+    // Maine yahan Marcus ke liye image link daal diya hai
+    img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=150&h=150&auto=format&fit=crop", 
+    color: ["#ffffff","#53bdeb"],
+    status: "online", 
+    about: "Coding all day every day 💻",
     msgs: [
       { id:1, from:"them", text:"Bhai wo React bug fix hua?", time:"Yesterday", date:"Yesterday", read:true },
     ]
@@ -26,7 +37,6 @@ const CONTACTS = [
 export default function App() {
   const [contacts, setContacts] = useState(CONTACTS);
   const [activeId, setActiveId] = useState(null);
-  const [search, setSearch] = useState("");
   const [msgInput, setMsgInput] = useState("");
   const [showEmoji, setShowEmoji] = useState(false);
   const [activeCall, setActiveCall] = useState(null); 
@@ -40,16 +50,6 @@ export default function App() {
 
   const initials = (name) => name ? name.split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2) : "";
   const getTime = () => new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-
-  const getLastMsg = (c) => {
-    if (!c.msgs.length) return "";
-    const last = c.msgs[c.msgs.length - 1];
-    const prefix = last.from === "me" ? "You: " : "";
-    if (last.type === "image") return prefix + "📷 Photo";
-    if (last.type === "audio") return prefix + "🎤 Voice message";
-    if (last.type === "call_log") return (last.callType === "video" ? "📹 Video call" : "📞 Voice call");
-    return prefix + last.text;
-  };
 
   const startCall = (type) => {
     if (!activeContact) return;
@@ -126,15 +126,21 @@ export default function App() {
 
   const handleKey = (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMsg(); } };
 
-  const filteredContacts = contacts.filter(c => c.name.toLowerCase().includes(search.toLowerCase()));
-
   return (
-    <div style={{ display: "flex", height: "100vh", width: "100vw", background: "#111b21", color: "#e9edef", fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif", overflow: "hidden", position: "relative" }}>
+    <div style={{ 
+      display: "flex", 
+      height: "100vh", 
+      width: "100vw", 
+      background: "#f0f2f5", 
+      color: "#111b21", 
+      fontFamily: "Segoe UI, Helvetica Neue, Helvetica, Lucida Grande, Arial, Ubuntu, Cantarell, Fira Sans, sans-serif", 
+      overflow: "hidden", 
+      position: "relative" 
+    }}>
       <style>{`
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        ::selection { background: #00a884; color: white; }
         ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-thumb { background: rgba(134, 150, 160, 0.2); }
+        ::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.1); }
       `}</style>
       
       {activeCall && (
@@ -145,21 +151,14 @@ export default function App() {
         />
       )}
 
-      {/* Sidebar Section */}
-      <div style={{ width: 400, minWidth: 400, display: "flex", flexDirection: "column", borderRight: "1px solid rgba(134, 150, 160, 0.15)" }}>
-        <SearchBar search={search} setSearch={setSearch} />
-        <ContactList 
-          contacts={filteredContacts} 
-          activeId={activeId} 
-          setActiveId={setActiveId} 
-          initials={initials} 
-          getTime={getTime} 
-          getLastMsg={getLastMsg} 
-        />
-      </div>
+      <Sidebar 
+        contacts={contacts} 
+        activeId={activeId} 
+        setActiveId={setActiveId} 
+        initials={initials} 
+      />
       
-      {/* Main Chat/Welcome Section */}
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", background: "#222e35" }}>
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", background: "#efeae2" }}>
         {activeContact ? (
           <>
             <ChatWindow 
@@ -180,20 +179,25 @@ export default function App() {
             />
           </>
         ) : (
-          <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", borderBottom: "6px solid #00a884", background: "#0b141a" }}>
-            <div style={{ textAlign: "center", maxWidth: "460px" }}>
-              <div style={{ marginBottom: "20px", opacity: 0.8 }}>
-                <svg width="350" height="150" viewBox="0 0 400 150">
-                  <circle cx="200" cy="75" r="50" fill="#222e35" />
-                  <path d="M190 65 L210 75 L190 85 Z" fill="#8696a0" />
-                </svg>
+          <div style={{ 
+            flex: 1, 
+            display: "flex", 
+            alignItems: "center", 
+            justifyContent: "center", 
+            background: "#f8f9fa", 
+            borderBottom: "6px solid #43c453", 
+            position: "relative"
+          }}>
+            <div style={{ textAlign: "center", maxWidth: "560px", padding: "20px" }}>
+              <div style={{ marginBottom: "30px" }}>
+                <div style={{ fontSize: "100px", color: "#cbd5e0", marginBottom: "20px" }}>📱</div>
               </div>
-              <h1 style={{ color: "#e9edef", fontWeight: 300, fontSize: "32px", marginBottom: "14px" }}>WhatsApp Web</h1>
-              <p style={{ color: "#8696a0", fontSize: "14px", lineHeight: "1.6", fontWeight: 400 }}>
-                Send and receive messages.<br/>
+              <h1 style={{ color: "#41525d", fontWeight: 300, fontSize: "32px", marginBottom: "14px" }}>WhatsApp Web</h1>
+              <p style={{ color: "#667781", fontSize: "14px", lineHeight: "1.6", fontWeight: 400 }}>
+                Send and receive messages<br/>
               </p>
-              <div style={{ marginTop: "80px", color: "#667781", fontSize: "14px", display: "flex", alignItems: "center", justifyContent: "center", gap: "5px" }}>
-                🔒 End-to-end encrypted
+              <div style={{ marginTop: "80px", color: "#8696a0", fontSize: "14px", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}>
+                <span style={{ fontSize: "12px" }}>🔒</span> End-to-end encrypted
               </div>
             </div>
           </div>
