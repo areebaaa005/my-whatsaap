@@ -1,21 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export default function Sidebar({ contacts, setActiveId, activeId, initials }) {
   const [searchTerm, setSearchTerm] = useState("");
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  // Screen size check karne ke liye taake design mobile ke mutabiq ho
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const filteredContacts = contacts.filter(c => 
     c.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  // Mobile logic: Agar koi chat select ho toh sidebar hide ho jaye
+  if (isMobile && activeId) return null;
+
   return (
     <div style={{ 
-      width: "30%", 
-      minWidth: "350px", 
+      width: isMobile ? "100%" : "30%", // Mobile par full width
+      minWidth: isMobile ? "100%" : "350px", 
       background: "#ffffff", 
       borderRight: "1px solid #e9edef", 
       display: "flex", 
       flexDirection: "column",
-      height: "100%"
+      height: "100%",
+      position: "relative"
     }}>
       
       <style>{`
@@ -25,7 +37,7 @@ export default function Sidebar({ contacts, setActiveId, activeId, initials }) {
         ::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.1); }
       `}</style>
 
-      {/* 1. Sidebar Header - Profile Picture added here */}
+      {/* 1. Sidebar Header */}
       <div style={{ 
         background: "#f0f2f5", 
         padding: "10px 16px", 
@@ -39,16 +51,15 @@ export default function Sidebar({ contacts, setActiveId, activeId, initials }) {
           background: "#00a884", display: "flex", 
           alignItems: "center", justifyContent: "center", 
           fontWeight: "600", color: "white", fontSize: "14px",
-          cursor: "pointer", overflow: "hidden" // Added overflow hidden
+          cursor: "pointer", overflow: "hidden"
         }}>
-          {/* User's own profile pic placeholder */}
           <img 
             src="https://randomuser.me/api/portraits/lego/1.jpg" 
             alt="Me" 
             style={{ width: "100%", height: "100%", objectFit: "cover" }} 
           />
         </div>
-        <div style={{ display: "flex", gap: "24px", color: "#54656f", fontSize: "20px" }}>
+        <div style={{ display: "flex", gap: isMobile ? "18px" : "24px", color: "#54656f", fontSize: "20px" }}>
           <span style={{ cursor: "pointer", opacity: 0.9 }} title="Communities">👥</span>
           <span style={{ cursor: "pointer", opacity: 0.9 }} title="Status">⭕</span>
           <span style={{ cursor: "pointer", opacity: 0.9 }} title="New Chat">💬</span>
@@ -81,7 +92,7 @@ export default function Sidebar({ contacts, setActiveId, activeId, initials }) {
         </div>
       </div>
 
-      {/* 3. Contacts List - Refined with Profile Image logic */}
+      {/* 3. Contacts List */}
       <div style={{ flex: 1, overflowY: "auto" }}>
         {filteredContacts.map((contact) => (
           <div 
@@ -97,13 +108,12 @@ export default function Sidebar({ contacts, setActiveId, activeId, initials }) {
               background: activeId === contact.id ? "#f0f2f5" : "transparent"
             }}
           >
-            {/* Profile Avatar with Image Fallback */}
             <div style={{ 
               width: 49, height: 49, borderRadius: "50%", 
               background: contact.color[1], color: contact.color[0], 
               display: "flex", alignItems: "center", justifyContent: "center", 
               fontWeight: "500", marginRight: "15px", fontSize: "17px",
-              flexShrink: 0, overflow: "hidden" // Added overflow hidden
+              flexShrink: 0, overflow: "hidden"
             }}>
               {contact.img ? (
                 <img 
@@ -116,7 +126,6 @@ export default function Sidebar({ contacts, setActiveId, activeId, initials }) {
               )}
             </div>
 
-            {/* Contact Details Wrapper */}
             <div style={{ 
               flex: 1, 
               height: "100%", 

@@ -9,7 +9,6 @@ const CONTACTS = [
     id: 1, 
     name: "Aisha Rahman", 
     avatar: "AR", 
-    // Maine yahan Aisha ke liye image link daal diya hai
     img: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=150&h=150&auto=format&fit=crop", 
     color: ["#ffffff","#00a884"],
     status: "online", 
@@ -23,7 +22,6 @@ const CONTACTS = [
     id: 2, 
     name: "Marcus Dev", 
     avatar: "MD", 
-    // Maine yahan Marcus ke liye image link daal diya hai
     img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=150&h=150&auto=format&fit=crop", 
     color: ["#ffffff","#53bdeb"],
     status: "online", 
@@ -40,9 +38,17 @@ export default function App() {
   const [msgInput, setMsgInput] = useState("");
   const [showEmoji, setShowEmoji] = useState(false);
   const [activeCall, setActiveCall] = useState(null); 
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
   const messagesEndRef = useRef(null);
   const activeContact = contacts.find(c => c.id === activeId);
+
+  // Responsiveness check
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -151,58 +157,65 @@ export default function App() {
         />
       )}
 
-      <Sidebar 
-        contacts={contacts} 
-        activeId={activeId} 
-        setActiveId={setActiveId} 
-        initials={initials} 
-      />
+      {/* Sidebar - Hide if mobile and a contact is active */}
+      {(!isMobile || !activeId) && (
+        <Sidebar 
+          contacts={contacts} 
+          activeId={activeId} 
+          setActiveId={setActiveId} 
+          initials={initials} 
+        />
+      )}
       
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", background: "#efeae2" }}>
-        {activeContact ? (
-          <>
-            <ChatWindow 
-              activeContact={activeContact} 
-              messagesEndRef={messagesEndRef} 
-              initials={initials} 
-              startCall={startCall} 
-            />
-            <InputBar 
-              msgInput={msgInput} 
-              setMsgInput={setMsgInput} 
-              sendMsg={sendMsg} 
-              handleKey={handleKey} 
-              setShowEmoji={setShowEmoji} 
-              showEmoji={showEmoji} 
-              sendImage={sendImage} 
-              sendAudio={sendAudio} 
-            />
-          </>
-        ) : (
-          <div style={{ 
-            flex: 1, 
-            display: "flex", 
-            alignItems: "center", 
-            justifyContent: "center", 
-            background: "#f8f9fa", 
-            borderBottom: "6px solid #43c453", 
-            position: "relative"
-          }}>
-            <div style={{ textAlign: "center", maxWidth: "560px", padding: "20px" }}>
-              <div style={{ marginBottom: "30px" }}>
-                <div style={{ fontSize: "100px", color: "#cbd5e0", marginBottom: "20px" }}>📱</div>
-              </div>
-              <h1 style={{ color: "#41525d", fontWeight: 300, fontSize: "32px", marginBottom: "14px" }}>WhatsApp Web</h1>
-              <p style={{ color: "#667781", fontSize: "14px", lineHeight: "1.6", fontWeight: 400 }}>
-                Send and receive messages<br/>
-              </p>
-              <div style={{ marginTop: "80px", color: "#8696a0", fontSize: "14px", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}>
-                <span style={{ fontSize: "12px" }}>🔒</span> End-to-end encrypted
+      {/* Chat Area - Hide if mobile and NO contact is active */}
+      {(!isMobile || activeId) && (
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", background: "#efeae2" }}>
+          {activeContact ? (
+            <>
+              <ChatWindow 
+                activeContact={activeContact} 
+                messagesEndRef={messagesEndRef} 
+                initials={initials} 
+                startCall={startCall} 
+                setActiveId={setActiveId} // Important for Back button
+              />
+              <InputBar 
+                msgInput={msgInput} 
+                setMsgInput={setMsgInput} 
+                sendMsg={sendMsg} 
+                handleKey={handleKey} 
+                setShowEmoji={setShowEmoji} 
+                showEmoji={showEmoji} 
+                sendImage={sendImage} 
+                sendAudio={sendAudio} 
+              />
+            </>
+          ) : (
+            <div style={{ 
+              flex: 1, 
+              display: "flex", 
+              alignItems: "center", 
+              justifyContent: "center", 
+              background: "#f8f9fa", 
+              borderBottom: "6px solid #43c453", 
+              position: "relative"
+            }}>
+              <div style={{ textAlign: "center", maxWidth: "560px", padding: "20px" }}>
+                <div style={{ marginBottom: "30px" }}>
+                  <div style={{ fontSize: isMobile ? "60px" : "100px", color: "#cbd5e0", marginBottom: "20px" }}>📱</div>
+                </div>
+                <h1 style={{ color: "#41525d", fontWeight: 300, fontSize: isMobile ? "24px" : "32px", marginBottom: "14px" }}>WhatsApp Web</h1>
+                <p style={{ color: "#667781", fontSize: "14px", lineHeight: "1.6", fontWeight: 400 }}>
+                  Send and receive messages without keeping your phone online.
+                </p>
+                <div style={{ marginTop: "80px", color: "#8696a0", fontSize: "14px", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}>
+                  <span style={{ fontSize: "12px" }}>🔒</span> End-to-end encrypted
+                </div>
               </div>
             </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
